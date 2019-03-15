@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fileUpload">
+	
+	<insert id="fileUpload.insertFile" parameterType="java.util.Map">
+		INSERT INTO TB_ATCH_FILE (
+			  TABLE_NM
+			, TABLE_SN
+			, FILE_GROUP
+			, STRE_COURS
+			, STRE_FILE_NM
+			, ORGINL_FILE_NM
+			, FILE_EXTSN
+			, FILE_SIZE
+			, SORT_ORDR
+			, REG_USER_SN
+			, REG_DATETIME
+			, REG_IP
+			, MOD_USER_SN
+			, MOD_DATETIME
+			, MOD_IP
+		) VALUES (
+			  #{tableNm}
+			, #{NOTICE_SN}
+			, #{NOTICE_SN}
+			, #{streCours}
+			, #{streFileNm}
+			, #{orginlFileNm}
+			, #{fileExtsn}
+			, #{fileSize}
+			, #{sortOrdr}
+			, #{REG_USER_SN}
+			, NOW()
+			, #{REG_IP}
+			, #{REG_USER_SN}
+			, NOW()
+			, #{REG_IP}
+		) 	
+	</insert>
+	
+	<update id="fileUpload.updateFile" parameterType="java.util.Map">
+		UPDATE TB_ATCH_FILE SET  
+			  STRE_COURS = #{streCours}
+			, STRE_FILE_NM = #{streFileNm}
+			, ORGINL_FILE_NM = #{orginlFileNm}
+			, FILE_EXTSN = #{fileExtsn}
+			, FILE_SIZE = #{fileSize}
+			, MOD_USER_SN = #{ MOD_USER_SN }
+			, MOD_DATETIME = SYSDATE()
+			, MOD_IP = #{ MOD_IP }
+		WHERE ATCH_FILE_SN = #{atchFileSn}
+	</update>
+	
+	<select id="fileUpload.selectFile" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			  ATCH_FILE_SN    AS atchFileSn
+			, TABLE_NM        AS tableNm
+			, TABLE_SN        AS tableSn
+			, FILE_GROUP      AS fileGroup
+			, STRE_COURS      AS streCours
+			, STRE_FILE_NM    AS streFileNm
+			, ORGINL_FILE_NM  AS orginlFileNm
+			, FILE_EXTSN      AS fileExtsn
+			, FILE_SIZE       AS fileSize
+			, SORT_ORDR       AS sortOrdr
+			, REG_USER_SN     AS regUserSn
+			, REG_DATETIME    AS regDatetime
+			, REG_IP          AS regIp
+			, MOD_USER_SN     AS modUserSn
+			, MOD_DATETIME    AS modDatetime
+			, MOD_IP          AS modIp
+		FROM TB_ATCH_FILE
+		WHERE TABLE_NM = #{tableNm} AND TABLE_SN = #{tableSn}
+		LIMIT 1
+	</select>
+
+	<select id="fileUpload.selectListFile" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT 
+			  ATCH_FILE_SN    AS atchFileSn
+			, TABLE_NM        AS tableNm
+			, TABLE_SN        AS tableSn
+			, FILE_GROUP      AS fileGroup
+			, STRE_COURS      AS streCours
+			, STRE_FILE_NM    AS streFileNm
+			, ORGINL_FILE_NM  AS orginlFileNm
+			, FILE_EXTSN      AS fileExtsn
+			, FILE_SIZE       AS fileSize
+			, SORT_ORDR       AS sortOrdr
+			, REG_USER_SN     AS regUserSn
+			, REG_DATETIME    AS regDatetime
+			, REG_IP          AS regIp
+			, MOD_USER_SN     AS modUserSn
+			, MOD_DATETIME    AS modDatetime
+			, MOD_IP          AS modIp
+		FROM TB_ATCH_FILE
+		WHERE TABLE_NM = #{tableNm} AND TABLE_SN = #{tableSn}
+		ORDER BY SORT_ORDR
+	</select>
+	
+	<delete id="fileUpload.deleteFile" parameterType="java.util.Map">
+		DELETE FROM 
+			TB_ATCH_FILE
+		WHERE TABLE_NM = #{tableNm} AND TABLE_SN = #{tableSn}
+	</delete>
+	
+</mapper>

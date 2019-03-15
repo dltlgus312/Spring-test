@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	   xmlns:context="http://www.springframework.org/schema/context"
+  	   xmlns:tx="http://www.springframework.org/schema/tx"
+  	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+			
+			
+	<!-- *.properties 파일을 위한 설정 -->
+	<context:property-placeholder location="/WEB-INF/spring/prop/*.properties" />
+			
+			
+	<!-- DB 연결 -->
+<!-- 	<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource"> -->
+<!-- 			<property name="driverClassName" value="${db.driver}" /> -->
+<!-- 			<property name="url" value="${db.url}" /> -->
+<!-- 			<property name="username" value="${db.name}" /> -->
+<!-- 			<property name="password" value="${db.password}" /> -->
+<!-- 			<property name="initialSize" value="0"/>  -->
+<!-- 			<property name="maxActive" value="8"/>  -->
+<!-- 			<property name="maxIdle" value="8"/>  -->
+<!-- 			<property name="minIdle" value="0"/>  -->
+<!-- 			<property name="maxWait" value="-1"/> -->
+<!-- 			<property name="removeAbandoned" value="true"></property> -->
+<!-- 			<property name="validationQuery" value="SELECT 1" /> -->
+<!-- 	</bean> -->
+	
+	<!-- DB 연결 -->
+	<bean id="dataSourceSpied" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+			<property name="driverClassName" value="${db.driver}" />
+			<property name="url" value="${db.url}" />
+			<property name="username" value="${db.name}" />
+			<property name="password" value="${db.password}" />
+	</bean>
+	
+	
+	<!-- LOG4J 설정 -->
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL :::"/>
+			</bean>
+		</property>
+	</bean>
+	
+	
+
+
+	<!-- MYBATIS 연결 -->	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:mapper/**/*_SQL.xml" />
+	</bean>
+	
+
+
+	<!-- 트랜젝션 설정 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="txPointcut" expression="within(*.*.*.*.*.*ServiceImpl)"  />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+	</aop:config>
+	
+	
+	
+	<!-- 파일 업로드 설정  -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="maxUploadSize" value="10000000"/>
+		<property name="uploadTempDir" value="uploadTempDir"/>
+	</bean> 
+
+	<bean id="uploadTempDir" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg value="/resources/"/>
+	</bean>
+</beans>
