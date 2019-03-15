@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userBoardHistoryDao">
+
+	<insert id="userBoardHistoryDao.insertBoardHistoryGener" parameterType="java.util.Map">
+		INSERT INTO TB_NOTICE_HISTORY 
+			(
+				  NOTICE_HISTORY_SN
+				, NOTICE_SN
+				, NOTICE_TITLE
+				, NOTICE_CONTENTS
+				, DELETE_YN
+				, REG_USER_SN
+				, REG_DATETIME
+				, REG_IP
+			)
+		VALUES 
+			(
+				  null
+				, #{NOTICE_SN}
+				, #{NOTICE_TITLE}
+				, #{NOTICE_CONTENTS}
+				, 'N'
+				, #{REG_USER_SN}
+				, NOW()
+				, #{REG_IP}
+			)
+	</insert>
+
+	<update id="userBoardHistoryDao.updateBoardHistoryModify" parameterType="java.util.Map">
+		UPDATE TB_NOTICE_HISTORY
+		SET 
+			  NOTICE_TITLE=#{NOTICE_TITLE}
+			, NOTICE_CONTENTS=#{NOTICE_CONTENTS}
+			, DELETE_YN=#{DELETE_YN} 
+		WHERE NOTICE_SN=#{NOTICE_SN}
+	</update>
+
+</mapper>
+
