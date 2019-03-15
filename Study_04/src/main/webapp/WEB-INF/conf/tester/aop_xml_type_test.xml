@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans.xsd
+							http://www.springframework.org/schema/aop		http://www.springframework.org/schema/aop/spring-aop.xsd">
+			
+			
+	<!-- 공통기능을 정의한 클래스 BEAN 생성 -->				
+	<bean id="logAop" class="com.perform.svs.aop_session_test.aop_proxy_logger.XmlTypeLoggerAop" />
+ 
+	<!-- AOP설정 -->
+	<aop:config>
+	    <!-- aspect id는 logger이고, logAop를 참조함 -->
+	    <aop:aspect id="logger" ref="logAop">
+	    
+	        <!-- pointcut(핵심 기능)의 id는 publicM이고, com.perform.svs.aop_session_test.controller 패키지에 있는 모든 클래스에 공통 기능을 적용 -->
+	        <aop:pointcut id="publicM" expression="within(com.perform.svs.aop_session_test.controller.AopXmlController*)"/>
+	        
+	        <!-- loggerAop()라는 공통 기능을 publicM라는 pointcut에 적용 -->
+	        <aop:around pointcut-ref="publicM" method="loggerAop"/>
+	    </aop:aspect>
+	</aop:config>
+
+</beans>  
