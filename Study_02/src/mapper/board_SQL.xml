@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userBoardDao">
+
+	<select id="userBoardDao.selectBoardList" parameterType="java.util.Map" resultType="java.util.Map">
+		/* userBoardDao.selectBoardList */
+		SELECT NOTICE_SN
+			, NOTICE_TITLE
+			, REG_USER_SN
+			, REG_DATETIME
+			, REG_IP
+		FROM TB_NOTICE
+		WHERE DELETE_YN = 'N' 
+  		<if test="search != null">
+<!--         	AND NOTICE_TITLE LIKE '%${search}%' -->
+        	AND NOTICE_TITLE LIKE CONCAT( '%', #{search}, '%' )
+		</if>
+		ORDER BY REG_DATETIME DESC
+		LIMIT #{page}, #{bundle}
+	</select>
+	
+	
+	<select id="userBoardDao.selectBoardContents" resultType="java.util.Map" parameterType="Integer">
+		/* userBoardDao.selectBoardContents */
+		SELECT NOTICE_SN
+			, NOTICE_TITLE
+			, NOTICE_CONTENTS
+			, DELETE_YN
+			, REG_USER_SN
+			, REG_DATETIME
+			, REG_IP
+			, MOD_USER_SN
+			, MOD_DATETIME
+			, MOD_IP
+		FROM TB_NOTICE
+		WHERE NOTICE_SN=#{number}
+	</select>
+
+	<select id="userBoardDao.selectBoardSearch" resultType="java.util.Map" parameterType="String" >
+		SELECT NOTICE_SN
+			, NOTICE_TITLE
+			, REG_USER_SN
+			, REG_DATETIME
+			, REG_IP
+		FROM TB_NOTICE 
+		WHERE NOTICE_TITLE LIKE '%${keyword}%'
+	</select>
+	
+	<select id="userBoardDao.selectBoardCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		FROM   TB_NOTICE
+		WHERE DELETE_YN = 'N' 
+  		<if test="search != null">
+        	AND NOTICE_TITLE LIKE CONCAT( '%', #{search}, '%' )
+		</if>
+	</select>
+
+	<insert id="userBoardDao.insertBoardGener" parameterType="java.util.Map">
+		INSERT INTO TB_NOTICE
+		VALUES (null, #{NOTICE_TITLE}, #{NOTICE_CONTENTS}, 'N', null,
+		NOW(), #{REG_IP}, null, NOW(), #{MOD_IP})
+	</insert>
+
+	<update id="userBoardDao.updateBoardModify" parameterType="java.util.Map">
+		UPDATE TB_NOTICE
+		SET NOTICE_TITLE=#{NOTICE_TITLE}, NOTICE_CONTENTS=#{NOTICE_CONTENTS},
+		MOD_DATETIME=NOW(), MOD_IP=#{MOD_IP} WHERE NOTICE_SN=#{NOTICE_SN}
+	</update>
+
+	<delete id="userBoardDao.deleteBoard" parameterType="Integer">
+		UPDATE TB_NOTICE
+		SET    DELETE_YN='Y' 
+		WHERE NOTICE_SN=#{NOTICE_SN}
+	</delete>
+	
+	<select id="userBoardDao.selectLastSn" resultType="java.lang.Integer">
+		SELECT 
+			MAX(NOTICE_SN)
+		FROM TB_NOTICE
+	</select>
+
+</mapper>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userNoticeDao">
+	
+	<select id="userNoticeDao.selectNoticeList" parameterType="Map" resultType="Map">
+		SELECT    NOTICE_SN
+				, NOTICE_TITLE
+				, NOTICE_CONTENTS
+				, DELETE_YN
+				, REG_USER_SN
+				, REG_DATETIME
+				, REG_IP
+				, MOD_USER_SN
+				, MOD_DATETIME
+				, MOD_IP
+		FROM      TB_NOTICE
+	</select>
+	
+</mapper>

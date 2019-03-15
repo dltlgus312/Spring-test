@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+  	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  	   xmlns:context="http://www.springframework.org/schema/context"
+  	   xmlns:tx="http://www.springframework.org/schema/tx"
+  	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+  	
+  	<mvc:annotation-driven></mvc:annotation-driven>
+  	
+  	
+	<!-- 스프링에서 관리 목적을 위한 스캔 경로  -->
+	<context:component-scan base-package="com.study" />
+	
+	<!-- Handler 설정 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- WebContent 로부터의 경로 지정 -->
+		<property name="prefix" value="/WEB-INF/spring/view/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- *.properties 파일을 위한 설정 -->
+	<context:property-placeholder location="/WEB-INF/spring/prop/*.properties" />
+	
+	
+	
+	
+	<!-- DB 연결 -->
+	<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource">
+			<property name="driverClassName" value="${db.driver}" />
+			<property name="url" value="${db.url}" />
+			<property name="username" value="${db.name}" />
+			<property name="password" value="${db.password}" />
+	</bean>
+	
+	
+	<!-- LOG4J 설정 -->
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL :::"/>
+			</bean>
+		</property>
+	</bean>
+
+
+
+
+	<!-- MYBATIS 연결 -->	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:mapper/**/*_SQL.xml" />
+	</bean>
+	
+
+
+
+	<!-- 트랜젝션 설정 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="txPointcut" expression="within(*.*.*.*.*.*ServiceImpl)"  />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+	</aop:config>
+
+</beans>  
